@@ -301,7 +301,12 @@ public class ConnectionStateSSLv3 extends ConnectionState {
         if (block_size != 0) {
             // check padding
             int padding_length = data[data.length-1] & 0xFF;
-            for (int i=0; i<padding_length; i++) {
+
+            // I don't think this padding is required for SSLv3
+            // (curl doesn't pass it, for one)
+            boolean STRICT_PADDING = false;
+
+            if (STRICT_PADDING) for (int i=0; i<padding_length; i++) {
                 if ((data[data.length-2-i] & 0xFF) != padding_length) {
                     throw new AlertException(
                             AlertProtocol.DECRYPTION_FAILED,
