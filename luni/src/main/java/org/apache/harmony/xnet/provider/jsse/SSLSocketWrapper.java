@@ -221,10 +221,10 @@ public class SSLSocketWrapper extends SSLSocketImpl {
         return socket.getLocalPort();
     }
 
-    @Override
-    public FileDescriptor getFileDescriptor$() {
-        return socket.getFileDescriptor$();
-    }
+//    @Override
+//    public FileDescriptor getFileDescriptor$() {
+//        return socket.getFileDescriptor$();
+//    }
 
     // -------------------------------------------------------------------
 

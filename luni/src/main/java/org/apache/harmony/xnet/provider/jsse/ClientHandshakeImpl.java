@@ -537,8 +537,8 @@ public class ClientHandshakeImpl extends HandshakeProtocol {
         }
         try {
             X509TrustManager x509tm = parameters.getTrustManager();
-            if (x509tm instanceof TrustManagerImpl) {
-                TrustManagerImpl tm = (TrustManagerImpl) x509tm;
+            if (x509tm instanceof ExtendedX509TrustManager) {
+                ExtendedX509TrustManager tm = (ExtendedX509TrustManager) x509tm;
                 tm.checkServerTrusted(serverCert.certs, authType, hostname);
             } else {
                 x509tm.checkServerTrusted(serverCert.certs, authType);

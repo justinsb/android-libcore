@@ -75,7 +75,7 @@ public class Logger {
             StringBuilder line = new StringBuilder();
             for (int i = 0; i < len; i++) {
                 line.append(prefix);
-                line.append(Byte.toHexString(data[i+offset], false));
+                line.append(android.Byte.toHexString(data[i+offset], false));
                 line.append(delimiter);
 
                 if (((i+1)%perLine) == 0) {
