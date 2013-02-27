@@ -18,6 +18,7 @@
 package org.apache.harmony.xnet.provider.jsse;
 
 import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 
 /**
  * This abstract class is a base for Record Protocol operating environmet
@@ -172,6 +173,19 @@ public abstract class ConnectionState {
             write_seq_num[i] = 0;
             read_seq_num[i] = 0;
         }
+    }
+
+    protected SecretKeySpec buildSecretKey(String algName, byte[] key) {
+        String secretKeyAlg = algName;
+        if (secretKeyAlg.startsWith("DESede/")) {
+            secretKeyAlg = "DESede";
+        }
+
+        if (secretKeyAlg.startsWith("AES/")) {
+            secretKeyAlg = "AES";
+        }
+
+        return new SecretKeySpec(key, 0, key.length, secretKeyAlg);
     }
 }
 

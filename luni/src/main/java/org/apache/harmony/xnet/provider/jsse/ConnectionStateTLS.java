@@ -198,20 +198,16 @@ public class ConnectionStateTLS extends ConnectionState {
             } else {
                 encCipher = Cipher.getInstance(algName);
                 decCipher = Cipher.getInstance(algName);
-                String secretKeyAlg = algName;
-                if (secretKeyAlg.startsWith("DESede/")) {
-                    secretKeyAlg = "DESede";
-                }
                 if (is_client) { // client side
-                    encCipher.init(Cipher.ENCRYPT_MODE,
-                                   new SecretKeySpec(client_key, secretKeyAlg), clientIV);
-                    decCipher.init(Cipher.DECRYPT_MODE,
-                                   new SecretKeySpec(server_key, secretKeyAlg), serverIV);
+                    encCipher.init(Cipher.ENCRYPT_MODE, buildSecretKey(algName, client_key),
+                                   clientIV);
+                    decCipher.init(Cipher.DECRYPT_MODE, buildSecretKey(algName, server_key),
+                                   serverIV);
                 } else { // server side
-                    encCipher.init(Cipher.ENCRYPT_MODE,
-                                   new SecretKeySpec(server_key, secretKeyAlg), serverIV);
-                    decCipher.init(Cipher.DECRYPT_MODE,
-                                   new SecretKeySpec(client_key, secretKeyAlg), clientIV);
+                    encCipher.init(Cipher.ENCRYPT_MODE, buildSecretKey(algName, server_key),
+                                   serverIV);
+                    decCipher.init(Cipher.DECRYPT_MODE, buildSecretKey(algName, client_key),
+                                   clientIV);
                 }
             }
 

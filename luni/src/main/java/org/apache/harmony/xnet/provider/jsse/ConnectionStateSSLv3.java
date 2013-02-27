@@ -18,6 +18,7 @@
 package org.apache.harmony.xnet.provider.jsse;
 
 import java.security.GeneralSecurityException;
+import java.security.Key;
 import java.security.MessageDigest;
 import java.util.Arrays;
 import javax.crypto.Cipher;
@@ -181,24 +182,15 @@ public class ConnectionStateSSLv3 extends ConnectionState {
                 encCipher = Cipher.getInstance(algName);
                 decCipher = Cipher.getInstance(algName);
 
-                String secretKeyAlg = algName;
-                if (secretKeyAlg.startsWith("DESede/")) {
-                    secretKeyAlg = "DESede";
-                }
-
                 if (is_client) { // client side
-                    encCipher.init(Cipher.ENCRYPT_MODE,
-                                   new SecretKeySpec(client_key, 0, key_size, secretKeyAlg),
+                    encCipher.init(Cipher.ENCRYPT_MODE, buildSecretKey(algName, client_key),
                                    clientIV);
-                    decCipher.init(Cipher.DECRYPT_MODE,
-                                   new SecretKeySpec(server_key, 0, key_size, secretKeyAlg),
+                    decCipher.init(Cipher.DECRYPT_MODE, buildSecretKey(algName, server_key),
                                    serverIV);
                 } else { // server side
-                    encCipher.init(Cipher.ENCRYPT_MODE,
-                                   new SecretKeySpec(server_key, 0, key_size, secretKeyAlg),
+                    encCipher.init(Cipher.ENCRYPT_MODE, buildSecretKey(algName, server_key),
                                    serverIV);
-                    decCipher.init(Cipher.DECRYPT_MODE,
-                                   new SecretKeySpec(client_key, 0, key_size, secretKeyAlg),
+                    decCipher.init(Cipher.DECRYPT_MODE, buildSecretKey(algName, client_key),
                                    clientIV);
                 }
             }
