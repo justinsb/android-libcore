@@ -235,9 +235,9 @@ public class ClientHandshakeImpl extends HandshakeProtocol {
                                        "Bad server hello cipher suite");
                         }
                         if (serverHello.server_version[1] == 1) {
-                            computerReferenceVerifyDataTLS("server finished");
+                            computerReferenceVerifyDataTLS("server finished", true);
                         } else {
-                            computerReferenceVerifyDataSSLv3(SSLv3Constants.server);
+                            computerReferenceVerifyDataSSLv3(SSLv3Constants.server, true);
                         }
                     }
                     session.protocol = servProt;
@@ -338,10 +338,10 @@ public class ClientHandshakeImpl extends HandshakeProtocol {
         byte[] verify_data;
         if (serverHello.server_version[1] == 1) {
             verify_data = new byte[12];
-            computerVerifyDataTLS("client finished", verify_data);
+            computerVerifyDataTLS("client finished", verify_data, true);
         } else {
             verify_data = new byte[36];
-            computerVerifyDataSSLv3(SSLv3Constants.client, verify_data);
+            computerVerifyDataSSLv3(SSLv3Constants.client, verify_data, true);
         }
         clientFinished = new Finished(verify_data);
         send(clientFinished);
@@ -350,9 +350,9 @@ public class ClientHandshakeImpl extends HandshakeProtocol {
             status = FINISHED;
         } else {
             if (serverHello.server_version[1] == 1) {
-                computerReferenceVerifyDataTLS("server finished");
+                computerReferenceVerifyDataTLS("server finished", true);
             } else {
-                computerReferenceVerifyDataSSLv3(SSLv3Constants.server);
+                computerReferenceVerifyDataSSLv3(SSLv3Constants.server, true);
             }
             status = NEED_UNWRAP;
         }

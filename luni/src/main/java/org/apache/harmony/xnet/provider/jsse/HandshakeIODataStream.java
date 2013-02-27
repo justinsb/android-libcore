@@ -432,4 +432,15 @@ public class HandshakeIODataStream
         System.arraycopy(buffer, 0, res, 0, len);
         return res;
     }
+
+    /**
+     * Returns all the data passed through the stream except last message
+     * @return
+     */
+    protected byte[] getMessagesWithoutLast() {
+        int len = marked_pos;
+        byte[] res = new byte[len];
+        System.arraycopy(buffer, 0, res, 0, len);
+        return res;
+    }
 }

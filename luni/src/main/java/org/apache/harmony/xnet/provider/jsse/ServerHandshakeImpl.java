@@ -264,6 +264,12 @@ public class ServerHandshakeImpl extends HandshakeProtocol {
                         return;
                     }
 
+                    if (serverHello.server_version[1] == 1) {
+                        computerReferenceVerifyDataTLS("client finished", false);;
+                    } else {
+                        computerReferenceVerifyDataSSLv3(SSLv3Constants.client, false);
+                    }
+
                     clientFinished = new Finished(io_stream, length);
                     verifyFinished(clientFinished.getData());
                     session.context = parameters.getServerSessionContext();
@@ -638,18 +644,18 @@ public class ServerHandshakeImpl extends HandshakeProtocol {
         boolean isTLS = (serverHello.server_version[1] == 1); // TLS 1.0 protocol
         if (isTLS) {
             verify_data = new byte[12];
-            computerVerifyDataTLS("server finished", verify_data);
+            computerVerifyDataTLS("server finished", verify_data, true);
         } else { // SSL 3.0 protocol (http://wp.netscape.com/eng/ssl3)
             verify_data = new byte[36];
-            computerVerifyDataSSLv3(SSLv3Constants.server, verify_data);
+            computerVerifyDataSSLv3(SSLv3Constants.server, verify_data, true);
         }
         serverFinished = new Finished(verify_data);
         send(serverFinished);
         if (isResuming) {
             if (isTLS) {
-                computerReferenceVerifyDataTLS("client finished");
+                computerReferenceVerifyDataTLS("client finished", true);
             } else {
-                computerReferenceVerifyDataSSLv3(SSLv3Constants.client);
+                computerReferenceVerifyDataSSLv3(SSLv3Constants.client, true);
             }
             status = NEED_UNWRAP;
         } else {
@@ -698,11 +704,6 @@ public class ServerHandshakeImpl extends HandshakeProtocol {
                 unexpectedMessage();
             } else {
                 changeCipherSpecReceived = true;
-            }
-            if (serverHello.server_version[1] == 1) {
-                computerReferenceVerifyDataTLS("client finished");
-            } else {
-                computerReferenceVerifyDataSSLv3(SSLv3Constants.client);
             }
         }
     }

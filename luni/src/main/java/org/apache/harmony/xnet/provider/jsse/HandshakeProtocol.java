@@ -335,8 +335,8 @@ public abstract class HandshakeProtocol {
      * @see <a href="http://www.ietf.org/rfc/rfc2246.txt">TLS spec. 7.4.9. Finished</a>
      * @param label
      */
-    protected void computerReferenceVerifyDataTLS(String label) {
-        computerVerifyDataTLS(label, verify_data);
+    protected void computerReferenceVerifyDataTLS(String label, boolean includeLast) {
+        computerVerifyDataTLS(label, verify_data, includeLast);
     }
 
     /**
@@ -345,9 +345,9 @@ public abstract class HandshakeProtocol {
      * @param label
      * @param buf
      */
-    protected void computerVerifyDataTLS(String label, byte[] buf) {
-        byte[] md5_digest = io_stream.getDigestMD5();
-        byte[] sha_digest = io_stream.getDigestSHA();
+    protected void computerVerifyDataTLS(String label, byte[] buf, boolean includeLast) {
+        byte[] md5_digest = includeLast ? io_stream.getDigestMD5() : io_stream.getDigestMD5withoutLast();
+        byte[] sha_digest = includeLast ? io_stream.getDigestSHA() : io_stream.getDigestSHAwithoutLast();
 
         byte[] digest = new byte[md5_digest.length + sha_digest.length];
         System.arraycopy(md5_digest, 0, digest, 0, md5_digest.length);
@@ -366,9 +366,9 @@ public abstract class HandshakeProtocol {
      * @see "SSLv3 spec. 7.6.9. Finished"
      * @param label
      */
-    protected void computerReferenceVerifyDataSSLv3(byte[] sender) {
+    protected void computerReferenceVerifyDataSSLv3(byte[] sender, boolean includeLast) {
         verify_data = new byte[36];
-        computerVerifyDataSSLv3(sender, verify_data);
+        computerVerifyDataSSLv3(sender, verify_data, includeLast);
     }
 
     /**
@@ -377,7 +377,7 @@ public abstract class HandshakeProtocol {
      * @param label
      * @param buf
      */
-    protected void computerVerifyDataSSLv3(byte[] sender, byte[] buf) {
+    protected void computerVerifyDataSSLv3(byte[] sender, byte[] buf, boolean includeLast) {
         MessageDigest md5;
         MessageDigest sha;
         try {
@@ -390,7 +390,7 @@ public abstract class HandshakeProtocol {
             return;
         }
         try {
-            byte[] handshake_messages = io_stream.getMessages();
+            byte[] handshake_messages = includeLast ? io_stream.getMessages() : io_stream.getMessagesWithoutLast();
             md5.update(handshake_messages);
             md5.update(sender);
             md5.update(session.master_secret);
