@@ -361,7 +361,7 @@ public class ServerHandshakeImpl extends HandshakeProtocol {
                 reuseCurrent = true;
             }
 
-            // find session in cash
+            // find session in cache
             sessionToResume = findSessionToResume(clientHello.session_id);
             if (sessionToResume == null || !sessionToResume.isValid()) {
                 if (!parameters.getEnableSessionCreation()) {
