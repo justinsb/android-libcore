@@ -236,6 +236,10 @@ public class ConnectionStateSSLv3 extends ConnectionState {
         try {
             int content_mac_length = len + hash_size;
             int padding_length = (block_size == 0) ? 0 : getPaddingSize(++content_mac_length);
+
+            // Padding length for SSLv3 is required to be minimal
+            while (padding_length >= block_size) padding_length -= block_size;
+
             byte[] res = new byte[content_mac_length + padding_length];
             System.arraycopy(fragment, offset, res, 0, len);
 
