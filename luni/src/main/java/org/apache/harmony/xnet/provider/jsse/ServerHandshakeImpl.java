@@ -39,6 +39,8 @@ import javax.net.ssl.X509ExtendedKeyManager;
 import javax.net.ssl.X509KeyManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.apache.harmony.xnet.provider.jsse.TlsExtensionNpn.NpnProtocol;
+
 /**
  * Server side handshake protocol implementation.
  * Handshake protocol operates on top of the Record Protocol.
@@ -273,6 +275,25 @@ public class ServerHandshakeImpl extends HandshakeProtocol {
                         status = FINISHED;
                     }
                     break;
+
+                case Handshake.NEXT_PROTOCOL: {
+                    if (!isResuming && !changeCipherSpecReceived) {
+                        // Out of sequence
+                        unexpectedMessage();
+                        return;
+                    }
+
+                    if (serverHello.extensions.findExtensionNpn() == null) {
+                        // We're not negotiating NPN
+                        unexpectedMessage();
+                        return;
+                    }
+
+                    nextProtocol = new NextProtocolMessage(io_stream, length);
+                    verifyNextProtocol(nextProtocol);
+                    break;
+                }
+
                 default:
                     unexpectedMessage();
                     return;
@@ -415,10 +436,23 @@ public class ServerHandshakeImpl extends HandshakeProtocol {
         session.protocol = ProtocolVersion.getByVersion(server_version);
         session.clientRandom = clientHello.random;
 
+        TlsExtensions extensions = TlsExtensions.EMPTY;
+
+        if (clientHello.extensions.findExtensionNpn() != null) {
+            // TODO: Move to provider interface
+            NpnProtocol[] protocols = new NpnProtocol[] { 
+                    NpnProtocol.HTTP_1_1,
+                    NpnProtocol.SPDY_2,
+                    NpnProtocol.SPDY_3 };
+            TlsExtensionNpn supported = new TlsExtensionNpn(protocols);
+            extensions = extensions.add(supported);
+        }
+
         // create server hello message
         serverHello = new ServerHello(parameters.getSecureRandom(),
                 server_version,
-                session.getId(), cipher_suite, (byte) 0); //CompressionMethod.null
+                session.getId(), cipher_suite, (byte) 0, //CompressionMethod.null
+                extensions);
         session.serverRandom = serverHello.random;
         send(serverHello);
         if (isResuming) {

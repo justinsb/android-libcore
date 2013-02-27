@@ -86,4 +86,10 @@ public class Handshake {
      */
     public static final byte FINISHED = 20;
 
+    /**
+    *
+    * finished handshake type
+    */
+    public static final byte NEXT_PROTOCOL = 67;
+
 }

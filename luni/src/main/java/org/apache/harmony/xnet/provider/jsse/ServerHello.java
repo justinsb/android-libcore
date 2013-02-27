@@ -54,6 +54,8 @@ public class ServerHello extends Message {
      */
     byte compression_method;
 
+    TlsExtensions extensions;
+
     /**
      * Creates outbound message
      * @param sr
@@ -63,7 +65,8 @@ public class ServerHello extends Message {
      * @param compression_method
      */
     public ServerHello(SecureRandom sr, byte[] server_version,
-            byte[] session_id, CipherSuite cipher_suite, byte compression_method) {
+            byte[] session_id, CipherSuite cipher_suite, byte compression_method,
+            TlsExtensions extensions) {
         long gmt_unix_time = new java.util.Date().getTime() / 1000;
         sr.nextBytes(random);
         random[0] = (byte) ((gmt_unix_time & 0xFF000000) >>> 24);
@@ -74,7 +77,9 @@ public class ServerHello extends Message {
         this.cipher_suite = cipher_suite;
         this.compression_method = compression_method;
         this.server_version = server_version;
-        length = 38 + session_id.length;
+        this.extensions = extensions;
+
+        length = 38 + session_id.length + extensions.length;
     }
 
     /**
@@ -114,7 +119,8 @@ public class ServerHello extends Message {
         out.write(session_id);
         out.write(cipher_suite.toBytes());
         out.write(compression_method);
-        length = 38 + session_id.length;
+        extensions.send(out);
+        length = 38 + session_id.length + extensions.length;
     }
 
     /**

@@ -109,6 +109,7 @@ public abstract class HandshakeProtocol {
     protected CertificateVerify certificateVerify;
     protected Finished clientFinished;
     protected Finished serverFinished;
+    protected NextProtocolMessage nextProtocol;
 
     /**
      * Indicates that change cipher spec message has been received
@@ -409,6 +410,14 @@ public abstract class HandshakeProtocol {
             fatalAlert(AlertProtocol.INTERNAL_ERROR, "INTERNAL ERROR", e);
 
         }
+    }
+
+    /**
+     * Verifies next protocol message
+     *
+     * @param nextProtocol
+     */
+    protected void verifyNextProtocol(NextProtocolMessage nextProtocol) {
     }
 
     /**

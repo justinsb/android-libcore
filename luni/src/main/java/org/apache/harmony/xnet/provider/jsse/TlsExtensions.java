@@ -25,15 +25,14 @@ public class TlsExtensions {
      */
     public TlsExtensions(TlsExtension[] extensions) {
         this.extensions = extensions;
-        if (extensions.length == 0) {
-            this.length = 0;
-        } else {
-            int length = 2;
-            for (TlsExtension extension : extensions) {
-                length += 4 + extension.length;
+        int length = 0;
+        if (extensions.length != 0) {
+            length = 2;
+            for (int i = 0; i < extensions.length; i++) {
+                length += 4 + extensions[i].length;
             }
-            this.length = length;
         }
+        this.length = length;
     }
 
     /**
@@ -77,6 +76,11 @@ public class TlsExtensions {
                             extensionDataLength);
                     break;
 
+                case TlsExtension.EXTENSION_NPN:
+                    extension = new TlsExtensionNpn(in, extensionType,
+                            extensionDataLength);
+                    break;
+
                 default:
                     extension = new TlsExtensionGeneric(in, extensionType,
                             extensionDataLength);
@@ -117,4 +121,37 @@ public class TlsExtensions {
     public TlsExtensionSni findExtensionSni() {
         return (TlsExtensionSni) findExtension(TlsExtension.EXTENSION_SNI);
     }
+
+    public TlsExtensionNpn findExtensionNpn() {
+        return (TlsExtensionNpn) findExtension(TlsExtension.EXTENSION_NPN);
+    }
+
+    /**
+     * Sends message
+     * 
+     * @param out
+     */
+    public void send(HandshakeIODataStream out) {
+        if (length == 0) {
+            return;
+        }
+
+        out.writeUint16(length - 2);
+        for (int i = 0; i < extensions.length; i++) {
+            extensions[i].send(out);
+        }
+    }
+
+    public TlsExtensions add(TlsExtension add) {
+        if (this.extensions.length == 0) {
+            return new TlsExtensions(new TlsExtension[] { add });
+        }
+
+        // Inefficient, but we don't expect to join many extensions
+        TlsExtension[] joined = new TlsExtension[this.extensions.length + 1];
+        System.arraycopy(this.extensions, 0, joined, 0, this.extensions.length);
+        joined[this.extensions.length] = add;
+        return new TlsExtensions(joined);
+    }
+
 }

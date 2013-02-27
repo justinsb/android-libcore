@@ -23,4 +23,17 @@ public class TlsExtensionGeneric extends TlsExtension {
         return data;
     }
 
+    /**
+     * Sends message
+     * 
+     * @param out
+     */
+    @Override
+    public void send(HandshakeIODataStream out) {
+        out.writeUint16(type);
+        out.writeUint16(length);
+
+        out.write(data);
+    }
+
 }

@@ -1,15 +1,9 @@
 package org.apache.harmony.xnet.provider.jsse;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
 import java.io.IOException;
-import java.security.Principal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import javax.net.ssl.SSLEngine;
 
 import libcore.io.Streams;
 
@@ -30,6 +24,10 @@ public class TlsExtensionSni extends TlsExtension {
 
     final List<SniName> names;
 
+    public List<SniName> getNames() {
+        return names;
+    }
+
     /**
      * Creates inbound message
      * 
@@ -37,7 +35,8 @@ public class TlsExtensionSni extends TlsExtension {
      * @param length
      * @throws IOException
      */
-    public TlsExtensionSni(HandshakeIODataStream in, int type, int length) throws IOException {
+    public TlsExtensionSni(HandshakeIODataStream in, int type, int length)
+            throws IOException {
         super(type, length);
 
         if (type != TlsExtension.EXTENSION_SNI) {
@@ -45,7 +44,7 @@ public class TlsExtensionSni extends TlsExtension {
         }
 
         int remaining = in.readUint16();
-        if (remaining > length) {
+        if (remaining != (length - 2)) {
             TlsExtensions.fatalAlert(AlertProtocol.DECODE_ERROR,
                     "DECODE ERROR: incorrect SNI extension");
         }
@@ -74,7 +73,25 @@ public class TlsExtensionSni extends TlsExtension {
         }
     }
 
-    public List<SniName> getNames() {
-        return names;
+    /**
+     * Sends message
+     * 
+     * @param out
+     */
+    @Override
+    public void send(HandshakeIODataStream out) {
+        out.writeUint16(type);
+        out.writeUint16(length);
+
+        out.writeUint16(length - 2);
+
+        for (int i = 0; i < names.size(); i++) {
+            SniName name = names.get(i);
+            out.writeUint8(name.type);
+            byte[] data = name.name;
+            out.writeUint16(data.length);
+            out.write(data);
+        }
     }
+
 }
