@@ -668,6 +668,13 @@ public class SSLEngineImpl extends SSLEngine {
                             SSLEngineResult.Status.BUFFER_OVERFLOW,
                             handshakeStatus, 0, 0);
                 }
+
+                if (!dataStream.hasData() && remaining_wrapped_data == null) {
+                    produced = 0;
+                    return new SSLEngineResult(getEngineStatus(),
+                            handshakeStatus, dataStream.consumed(), produced);
+                }
+
                 if (remaining_wrapped_data == null) {
                     remaining_wrapped_data =
                         recordProtocol.wrap(ContentType.APPLICATION_DATA,
