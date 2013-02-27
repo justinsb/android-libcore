@@ -57,6 +57,11 @@ public class ClientHello extends Message {
     final byte[] compression_methods;
 
     /**
+     * Extensions (RFC 3546)
+     */
+    final TlsExtensions extensions;
+
+    /**
      * Creates outbound message
      * @param sr
      * @param version
@@ -77,6 +82,8 @@ public class ClientHello extends Message {
         compression_methods = new byte[] { 0 }; // CompressionMethod.null
         length = 38 + session_id.length + (this.cipher_suites.length << 1)
                 + compression_methods.length;
+
+        this.extensions = TlsExtensions.EMPTY;
     }
 
     /**
@@ -113,6 +120,16 @@ public class ClientHello extends Message {
         if (this.length > length) {
             fatalAlert(AlertProtocol.DECODE_ERROR, "DECODE ERROR: incorrect ClientHello");
         }
+
+        // Read extensions if provided
+        if (this.length < length) {
+            this.extensions = new TlsExtensions(in, length - this.length);
+            length += extensions.length;
+            this.length = length;
+        } else {
+            this.extensions = TlsExtensions.EMPTY;
+        }
+
         // for forward compatibility, extra data is permitted;
         // must be ignored
         if (this.length < length) {
@@ -166,6 +183,8 @@ public class ClientHello extends Message {
         }
         this.length = 38 + session_id.length + (cipher_suites.length << 1)
                 + compression_methods.length;
+
+        this.extensions = TlsExtensions.EMPTY;
     }
 
     /**

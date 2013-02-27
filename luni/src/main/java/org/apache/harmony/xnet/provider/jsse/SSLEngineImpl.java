@@ -28,11 +28,13 @@ import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLSession;
 
+import org.apache.harmony.xnet.provider.jsse.TlsExtensions;
+
 /**
  * Implementation of SSLEngine.
  * @see javax.net.ssl.SSLEngine class documentation for more information.
  */
-public class SSLEngineImpl extends SSLEngine {
+public class SSLEngineImpl extends SSLEngine implements TlsExtensionParameters {
 
     // indicates if peer mode was set
     private boolean peer_mode_was_set = false;
@@ -757,5 +759,14 @@ public class SSLEngineImpl extends SSLEngine {
         return (engine_was_closed)
             ? SSLEngineResult.Status.CLOSED
             : SSLEngineResult.Status.OK;
+    }
+
+    @Override
+    public TlsExtensions getClientHelloExtensions() {
+        if (handshakeProtocol == null) {
+            return null;
+        }
+
+        return handshakeProtocol.getClientHelloExtensions();
     }
 }

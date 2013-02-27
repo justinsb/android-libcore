@@ -527,4 +527,11 @@ public abstract class HandshakeProtocol {
         preMasterSecret = null;
         delegatedTasks.clear();
     }
+
+    public TlsExtensions getClientHelloExtensions() {
+        if (clientHello == null) {
+            return null;
+        }
+        return clientHello.extensions;
+    }
 }
