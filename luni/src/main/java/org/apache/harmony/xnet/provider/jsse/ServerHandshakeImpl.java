@@ -89,7 +89,7 @@ public class ServerHandshakeImpl extends HandshakeProtocol {
     }
 
     /**
-     * Proceses inbound handshake messages
+     * Processes inbound handshake messages
      * @param bytes
      */
     @Override

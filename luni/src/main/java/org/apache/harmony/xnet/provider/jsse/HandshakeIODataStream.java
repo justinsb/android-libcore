@@ -29,31 +29,31 @@ import javax.net.ssl.SSLHandshakeException;
  * for handshake layer. It provides read and write operations
  * and accumulates all sent/received handshake's data.
  * This class can be presented as a combination of 2 data pipes.
- * The first data pipe is a pipe of income data: append method
+ * The first data pipe is a pipe of incoming data: append method
  * places the data at the beginning of the pipe, and read methods
- * consume the data from the pipe. The second pipe is an outcoming
- * data pipe: write operations plases the data into the pipe,
+ * consume the data from the pipe. The second pipe is an outgoing
+ * data pipe: write operations place the data into the pipe,
  * and getData methods consume the data.
- * It is important to note that work with pipe cound not be
+ * It is important to note that work with pipe could not be
  * started if there is unconsumed data in another pipe. It is
  * reasoned by the following: handshake protocol performs read
- * and write operations consecuently. I.e. it first reads all
- * income data and only than produces the responce and places it
+ * and write operations consecutively. I.e. it first reads all
+ * incoming data and only then produces the response and places it
  * into the stream.
  * The read operations of the stream presented by the methods
  * of SSLInputStream which in its turn is an extension of InputStream.
  * So this stream can be used as an InputStream parameter for
  * certificate generation.
  * Also input stream functionality supports marks. The marks
- * help to reset the position of the stream in case of incompleate
+ * help to reset the position of the stream in case of incomplete
  * handshake records. Note that in case of exhausting
- * of income data the EndOfBufferException is thown which implies
+ * of incoming data the EndOfBufferException is thrown which implies
  * the following:
  *  1. the stream contains scrappy handshake record,
  *  2. the read position should be reseted to marked,
  *  3. and more income data is expected.
  * The throwing of the exception (instead of returning of -1 value
- * or incompleate filling of destination buffer)
+ * or incomplete filling of destination buffer)
  * helps to speed up the process of scrappy data recognition and
  * processing.
  * For more information about TLS handshake process see
@@ -120,7 +120,7 @@ public class HandshakeIODataStream
 
     /**
      * Removes the data from the marked position to
-     * the current read position. The method is usefull when it is needed
+     * the current read position. The method is useful when it is needed
      * to delete one message from the internal buffer.
      */
     protected void removeFromMarkedPosition() {
@@ -371,7 +371,7 @@ public class HandshakeIODataStream
     // ---------------------- Message Digest Functionality ----------------
 
     /**
-     * Returns the MD5 digest of the data passed throught the stream
+     * Returns the MD5 digest of the data passed through the stream
      * @return MD5 digest
      */
     protected byte[] getDigestMD5() {
@@ -399,7 +399,7 @@ public class HandshakeIODataStream
     }
 
     /**
-     * Returns the MD5 digest of the data passed throught the stream
+     * Returns the MD5 digest of the data passed through the stream
      * except last message
      * @return MD5 digest
      */
@@ -411,7 +411,7 @@ public class HandshakeIODataStream
     }
 
     /**
-     * Returns the SHA-1 digest of the data passed throught the stream
+     * Returns the SHA-1 digest of the data passed through the stream
      * except last message
      * @return SHA-1 digest
      */
@@ -423,8 +423,8 @@ public class HandshakeIODataStream
     }
 
     /**
-     * Returns all the data passed throught the stream
-     * @return all the data passed throught the stream at the moment
+     * Returns all the data passed through the stream
+     * @return all the data passed through the stream at the moment
      */
     protected byte[] getMessages() {
         int len = (read_pos_end > write_pos) ? read_pos_end : write_pos;

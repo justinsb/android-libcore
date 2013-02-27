@@ -66,7 +66,7 @@ public abstract class HandshakeProtocol {
     protected int status = NOT_HANDSHAKING;
 
     /**
-     * IO stream for income/outcome handshake data
+     * IO stream for incoming/outgoing handshake data
      */
     protected HandshakeIODataStream io_stream = new HandshakeIODataStream();
 
@@ -76,7 +76,7 @@ public abstract class HandshakeProtocol {
     protected SSLRecordProtocol recordProtocol;
 
     /**
-     * SSLParametersImpl suplied by SSLSocket or SSLEngine
+     * SSLParametersImpl supplied by SSLSocket or SSLEngine
      */
     protected SSLParametersImpl parameters;
 
@@ -428,7 +428,7 @@ public abstract class HandshakeProtocol {
      */
     protected void verifyFinished(byte[] data) {
         if (!Arrays.equals(verify_data, data)) {
-            fatalAlert(AlertProtocol.HANDSHAKE_FAILURE, "Incorrect FINISED");
+            fatalAlert(AlertProtocol.HANDSHAKE_FAILURE, "Incorrect FINISHED");
         }
     }
 
