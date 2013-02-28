@@ -543,4 +543,11 @@ public abstract class HandshakeProtocol {
         }
         return clientHello.extensions;
     }
+
+    public byte[] getNpnSelectedProtocol() {
+        if (nextProtocol == null) {
+            return null;
+        }
+        return nextProtocol.getProtocol();
+    }
 }

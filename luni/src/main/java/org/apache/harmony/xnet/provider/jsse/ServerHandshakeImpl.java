@@ -445,13 +445,12 @@ public class ServerHandshakeImpl extends HandshakeProtocol {
         TlsExtensions extensions = TlsExtensions.EMPTY;
 
         if (clientHello.extensions.findExtensionNpn() != null) {
-            // TODO: Move to provider interface
-            NpnProtocol[] protocols = new NpnProtocol[] { 
-                    NpnProtocol.HTTP_1_1,
-                    NpnProtocol.SPDY_2,
-                    NpnProtocol.SPDY_3 };
-            TlsExtensionNpn supported = new TlsExtensionNpn(protocols);
-            extensions = extensions.add(supported);
+            if (engineOwner.npnServerProvider != null) {
+                TlsExtensionNpn supported = engineOwner.npnServerProvider.getSupportedProtocols(this.session);
+                if (supported != null) {
+                    extensions = extensions.add(supported);
+                }
+            }
         }
 
         // create server hello message

@@ -28,13 +28,15 @@ import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLSession;
 
+import org.apache.harmony.xnet.provider.jsse.NextProtocolNegotiation.ServerProvider;
+import org.apache.harmony.xnet.provider.jsse.NextProtocolNegotiation.SupportsNextProtocolNegotiation;
 import org.apache.harmony.xnet.provider.jsse.TlsExtensions;
 
 /**
  * Implementation of SSLEngine.
  * @see javax.net.ssl.SSLEngine class documentation for more information.
  */
-public class SSLEngineImpl extends SSLEngine implements TlsExtensionParameters {
+public class SSLEngineImpl extends SSLEngine implements TlsExtensionParameters, SupportsNextProtocolNegotiation {
 
     // indicates if peer mode was set
     private boolean peer_mode_was_set = false;
@@ -81,6 +83,8 @@ public class SSLEngineImpl extends SSLEngine implements TlsExtensionParameters {
 
     // logger
     private Logger.Stream logger = Logger.getStream("engine");
+
+    protected ServerProvider npnServerProvider;
 
     protected SSLEngineImpl(SSLParametersImpl sslParameters) {
         this.sslParameters = sslParameters;
@@ -768,5 +772,27 @@ public class SSLEngineImpl extends SSLEngine implements TlsExtensionParameters {
         }
 
         return handshakeProtocol.getClientHelloExtensions();
+    }
+
+    @Override
+    public void setNpnServerProvider(NextProtocolNegotiation.ServerProvider npnServerProvider) {
+        this.npnServerProvider = npnServerProvider;
+    }
+
+    @Override
+    public byte[] getNpnSelectedProtocol() {
+        if (handshakeProtocol == null) {
+            return null;
+        }
+
+        return handshakeProtocol.getNpnSelectedProtocol();
+    }
+
+    @Override
+    public boolean isNpnNegotiationComplete() {
+        if (session == null) {
+            return false;
+        }
+        return true;
     }
 }
