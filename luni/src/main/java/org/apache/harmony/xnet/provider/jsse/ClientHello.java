@@ -224,4 +224,8 @@ public class ClientHello extends Message {
     public int getType() {
         return Handshake.CLIENT_HELLO;
     }
+
+    public TlsExtensions getExtensions() {
+        return extensions;
+    }
 }
